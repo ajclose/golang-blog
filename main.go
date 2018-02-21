@@ -10,10 +10,11 @@ import (
 func main() {
 	r := httprouter.New()
 	uc := controllers.NewUserController()
+	sc := controllers.NewSessionController()
 	r.GET("/", uc.Show)
 	r.GET("/signup", uc.New)
 	r.POST("/signup", uc.Create)
-	r.GET("/login", controllers.NewSession)
-	r.POST("/login", controllers.CreateSession)
+	r.GET("/login", sc.New)
+	r.POST("/login", sc.Create)
 	http.ListenAndServe("localhost:8080", r)
 }
