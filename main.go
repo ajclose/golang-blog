@@ -16,5 +16,6 @@ func main() {
 	r.POST("/signup", uc.Create)
 	r.GET("/login", sc.New)
 	r.POST("/login", sc.Create)
+	r.GET("/logout", sc.Destroy)
 	http.ListenAndServe("localhost:8080", r)
 }

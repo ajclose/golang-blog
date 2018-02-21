@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/ajclose/golang-blog/config"
@@ -36,4 +37,19 @@ func (sc SessionController) Create(w http.ResponseWriter, r *http.Request, _ htt
 	}
 	models.CreateSession(w, r, u.Id.Hex())
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func (sc SessionController) Destroy(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	c, _ := r.Cookie("session")
+	err := config.Sessions.Remove(bson.M{"session_id": c.Value})
+	if err != nil {
+		fmt.Println(err)
+	}
+	c = &http.Cookie{
+		Name:   "session",
+		Value:  "",
+		MaxAge: -1,
+	}
+	http.SetCookie(w, c)
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
