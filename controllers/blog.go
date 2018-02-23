@@ -37,8 +37,7 @@ func (bc BlogController) Create(w http.ResponseWriter, r *http.Request, _ httpro
 	user := models.FindUserBySessionId(r)
 	title := r.FormValue("title")
 	body := r.FormValue("body")
-	author_id := user.Id.Hex()
-	models.CreateBlog(title, body, author_id)
+	models.CreateBlog(title, body, user)
 	http.Redirect(w, r, "/blogs", http.StatusFound)
 }
 

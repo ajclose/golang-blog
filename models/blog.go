@@ -7,11 +7,16 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-type Blog struct {
-	Id        string `json:"id" bson:"_id"`
-	Title     string
-	Body      string
+type Author struct {
 	Author_id string
+	Username  string
+}
+
+type Blog struct {
+	Id    string `json:"id" bson:"_id"`
+	Title string
+	Body  string
+	Author
 }
 
 func FindBlogs() []Blog {
@@ -24,12 +29,12 @@ func FindBlogs() []Blog {
 	return blogs
 }
 
-func CreateBlog(title, body, author_id string) {
+func CreateBlog(title string, body string, user User) {
 	var blog Blog
 	blog.Id = bson.NewObjectId().Hex()
 	blog.Title = title
 	blog.Body = body
-	blog.Author_id = author_id
+	blog.Author = Author{user.Id.Hex(), user.Username}
 	err := config.Blogs.Insert(blog)
 	if err != nil {
 		fmt.Println(err)
