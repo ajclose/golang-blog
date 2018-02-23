@@ -1,0 +1,46 @@
+package models
+
+import (
+	"fmt"
+
+	"github.com/ajclose/golang-blog/config"
+	"gopkg.in/mgo.v2/bson"
+)
+
+type Blog struct {
+	Id        string `json:"id" bson:"_id"`
+	Title     string
+	Body      string
+	Author_id string
+}
+
+func FindBlogs() []Blog {
+	blogs := []Blog{}
+	err := config.Blogs.Find(bson.M{}).All(&blogs)
+	if err != nil {
+		fmt.Println("error")
+		return blogs
+	}
+	return blogs
+}
+
+func CreateBlog(title, body, author_id string) {
+	var blog Blog
+	blog.Id = bson.NewObjectId().Hex()
+	blog.Title = title
+	blog.Body = body
+	blog.Author_id = author_id
+	err := config.Blogs.Insert(blog)
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
+func FindBlog(id string) Blog {
+	blog := Blog{}
+	err := config.Blogs.FindId(id).One(&blog)
+	if err != nil {
+		return blog
+	}
+	return blog
+}

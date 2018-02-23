@@ -6,6 +6,8 @@
   </head>
   <body>
     {{template "user-header"}}
-    <h3>hello {{.Username}}</h3>
+    <h1>{{.Title}}</h1>
+    <a href="/blogs/{{.Id}}/edit">Edit</a>
+    <p>{{.Body}}</p>
   </body>
 </html>

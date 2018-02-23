@@ -10,6 +10,7 @@ var DB *mgo.Database
 
 var Users *mgo.Collection
 var Sessions *mgo.Collection
+var Blogs *mgo.Collection
 
 func init() {
 	s, err := mgo.Dial("mongodb://localhost/golang-blog")
@@ -24,6 +25,7 @@ func init() {
 	DB = s.DB("golang-blog")
 	Users = DB.C("users")
 	Sessions = DB.C("sessions")
+	Blogs = DB.C("blogs")
 
 	fmt.Println("Connected to db")
 }
