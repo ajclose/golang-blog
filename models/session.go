@@ -6,6 +6,7 @@ import (
 
 	"github.com/ajclose/golang-blog/config"
 	uuid "github.com/satori/go.uuid"
+	"gopkg.in/mgo.v2/bson"
 )
 
 type Session struct {
@@ -26,4 +27,16 @@ func CreateSession(w http.ResponseWriter, r *http.Request, id string) {
 	if err != nil {
 		fmt.Println(err)
 	}
+}
+
+func IsLoggedIn(r *http.Request) bool {
+	c, err := r.Cookie("session")
+	if err != nil {
+		return false
+	}
+	u := config.Sessions.Find(bson.M{"session_id": c.Value})
+	if u != nil {
+		return true
+	}
+	return false
 }

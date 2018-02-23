@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/ajclose/golang-blog/config"
@@ -20,14 +19,23 @@ func (uc UserController) New(w http.ResponseWriter, r *http.Request, _ httproute
 }
 
 func (uc UserController) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	u, err := models.CreateUser(r)
+	email := r.FormValue("email")
+	username := r.FormValue("username")
+	password := r.FormValue("password")
+	u, err := models.CreateUser(email, username, password)
 	if err != nil {
-		log.Fatalln(err)
+		config.TPL.ExecuteTemplate(w, "user_new.gohtml", err)
+		return
 	}
 	models.CreateSession(w, r, u.Id.Hex())
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 func (uc UserController) Show(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	config.TPL.ExecuteTemplate(w, "user_show.gohtml", nil)
+	if models.IsLoggedIn(r) {
+		user := models.FindUserBySessionId(r)
+		config.TPL.ExecuteTemplate(w, "user_show.gohtml", user)
+		return
+	}
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }

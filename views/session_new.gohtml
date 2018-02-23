@@ -5,7 +5,9 @@
     <title></title>
   </head>
   <body>
+    {{template "header"}}
     <h1>Login</h1>
+    {{.}}
     <form method="post">
       <input type="text" name="username" value="" placeholder="username">
       <input type="password" name="password" value="" placeholder="password">

@@ -27,12 +27,12 @@ func (sc SessionController) Create(w http.ResponseWriter, r *http.Request, _ htt
 	u := models.User{}
 	ok := config.Users.Find(bson.M{"username": un}).One(&u)
 	if ok != nil {
-		http.Error(w, "Username or password is not correct", http.StatusForbidden)
+		config.TPL.ExecuteTemplate(w, "session_new.gohtml", "Username or password is incorrect")
 		return
 	}
 	err := bcrypt.CompareHashAndPassword(u.Password, []byte(p))
 	if err != nil {
-		http.Error(w, "Username or password is not correct", http.StatusForbidden)
+		config.TPL.ExecuteTemplate(w, "session_new.gohtml", "Username or password is incorrect")
 		return
 	}
 	models.CreateSession(w, r, u.Id.Hex())
