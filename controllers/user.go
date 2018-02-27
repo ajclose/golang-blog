@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/ajclose/golang-blog/config"
@@ -32,10 +33,12 @@ func (uc UserController) Create(w http.ResponseWriter, r *http.Request, _ httpro
 }
 
 func (uc UserController) Show(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	if models.IsLoggedIn(r) {
-		user := models.FindUserBySessionId(r)
-		config.TPL.ExecuteTemplate(w, "user_show.gohtml", user)
+	if !models.IsLoggedIn(r) {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
 	}
-	http.Redirect(w, r, "/login", http.StatusSeeOther)
+	user := models.FindUserBySessionId(r)
+	blogs := models.FindUserBlogs(user.Id.Hex())
+	fmt.Println(blogs)
+	config.TPL.ExecuteTemplate(w, "user_show.gohtml", blogs)
 }
