@@ -20,9 +20,9 @@ type Blog struct {
 	Published bool `json:"published"`
 }
 
-func FindBlogs() []Blog {
+func FindBlogs(published bool) []Blog {
 	blogs := []Blog{}
-	err := config.Blogs.Find(bson.M{}).All(&blogs)
+	err := config.Blogs.Find(bson.M{"published": published}).All(&blogs)
 	if err != nil {
 		fmt.Println("error")
 		return blogs

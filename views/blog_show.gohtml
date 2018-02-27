@@ -17,16 +17,22 @@
 </head>
   <body>
 {{template "user-header"}}
+<a class="edit-link" ></a>
 <div class="fr-view">
 </div>
 <script>
 const viewer = document.querySelector('.fr-view')
 const url = window.location.href.split('/')
 const id = url[url.length - 1]
+const editLink = document.querySelector('.edit-link')
 fetch('http://localhost:8080/api/blogs/'+id)
 .then(res => res.json())
 .then(json => {
     viewer.insertAdjacentHTML('afterbegin', json.body)
+    if (!json.published) {
+      editLink.href = `/blogs/${id}/edit`
+      editLink.textContent = 'Edit'
+    }
 })
 .catch(err => console.error(err))
 </script>
