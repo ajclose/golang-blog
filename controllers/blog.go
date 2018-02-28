@@ -28,6 +28,7 @@ func (bc BlogController) Index(w http.ResponseWriter, r *http.Request, _ httprou
 	blogs := models.FindBlogs(true)
 	config.TPL.ExecuteTemplate(w, "blog_index.gohtml", blogs)
 }
+
 func (bc BlogController) Drafts(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	blogs := models.FindBlogs(false)
 	config.TPL.ExecuteTemplate(w, "blog_index.gohtml", blogs)
