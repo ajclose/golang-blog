@@ -21,6 +21,15 @@ type Blog struct {
 	Author    string `json:"author"`
 }
 
+type DefaultText struct {
+	ParagraphTitle string `bson:"paragraphTitle"`
+	ParagraphBody  string `bson:"paragraphBody"`
+}
+
+type Image struct {
+	Img string `json:'img'`
+}
+
 func FindBlogs(published bool) []Blog {
 	blogs := []Blog{}
 	err := config.Blogs.Find(bson.M{"published": published}).All(&blogs)

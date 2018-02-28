@@ -14,6 +14,8 @@ import (
 	"github.com/ajclose/golang-blog/config"
 	"github.com/ajclose/golang-blog/models"
 	"github.com/julienschmidt/httprouter"
+	uuid "github.com/satori/go.uuid"
+	"gopkg.in/mgo.v2/bson"
 )
 
 type BlogController struct{}
@@ -118,7 +120,8 @@ func (bc BlogController) UploadImage(w http.ResponseWriter, r *http.Request, _ h
 	ext := strings.Split(fh.Filename, ".")[1]
 	h := sha1.New()
 	io.Copy(h, mf)
-	fname := fmt.Sprintf("%x", h.Sum(nil)) + "." + ext
+	uid, _ := uuid.NewV4()
+	fname := uid.String() + "." + ext
 	wd, err := os.Getwd()
 	if err != nil {
 		fmt.Println(err)
@@ -134,5 +137,39 @@ func (bc BlogController) UploadImage(w http.ResponseWriter, r *http.Request, _ h
 	res := make(map[string]string)
 	res["link"] = "http://localhost:8080/public/images/" + fname
 	json, err := json.Marshal(res)
+	w.Write(json)
+}
+func (bc BlogController) DeleteImage(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	fmt.Println(r)
+	img := models.Image{}
+	b, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		fmt.Println(err)
+	}
+	err = json.Unmarshal(b, &img)
+	if err != nil {
+		fmt.Println(err)
+	}
+	wd, err := os.Getwd()
+	if err != nil {
+		fmt.Println(err)
+	}
+	path := filepath.Join(wd, "public", "images", img.Img)
+	os.Remove(path)
+}
+
+func (bc BlogController) APIDefaultText(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	text := models.DefaultText{}
+	err := config.DefaultText.Find(bson.M{}).One(&text)
+	fmt.Println(text)
+	if err != nil {
+		fmt.Println(err)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json, err := json.Marshal(text)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 	w.Write(json)
 }

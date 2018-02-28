@@ -30,6 +30,8 @@ func main() {
 	r.POST("/blogs/:id/edit", bc.Update)
 	r.DELETE("/blogs/:id", bc.Destroy)
 	r.POST("/upload_image", bc.UploadImage)
+	r.GET("/api/defaulttext", bc.APIDefaultText)
+	r.POST("/delete_image", bc.DeleteImage)
 	r.ServeFiles("/dist/*filepath", http.Dir("dist"))
 	r.ServeFiles("/public/*filepath", http.Dir("public"))
 	c := cors.New(cors.Options{
