@@ -7,17 +7,18 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-type Author struct {
-	Author_id string `bson:"author_id"`
-	Username  string `bson:"username"`
+type Creator struct {
+	Creator_id string `bson:"creator_id"`
+	Username   string `bson:"username"`
 }
 
 type Blog struct {
 	Id        string `json:"id" bson:"_id"`
 	Title     string `json:"title"`
 	Body      string `json:"body"`
-	Author    `bson:"author"`
-	Published bool `json:"published"`
+	Creator   `bson:"creator"`
+	Published bool   `json:"published"`
+	Author    string `json:"author"`
 }
 
 func FindBlogs(published bool) []Blog {
@@ -33,7 +34,7 @@ func FindBlogs(published bool) []Blog {
 func FindUserBlogs(user_id string) []Blog {
 	blogs := []Blog{}
 	fmt.Println(user_id)
-	err := config.Blogs.Find(bson.M{"author.author_id": user_id}).All(&blogs)
+	err := config.Blogs.Find(bson.M{"creator.creator_id": user_id}).All(&blogs)
 	if err != nil {
 		fmt.Println(err)
 		return blogs
@@ -43,7 +44,7 @@ func FindUserBlogs(user_id string) []Blog {
 
 func CreateBlog(blog Blog, user User) {
 	blog.Id = bson.NewObjectId().Hex()
-	blog.Author = Author{user.Id.Hex(), user.Username}
+	blog.Creator = Creator{user.Id.Hex(), user.Username}
 
 	err := config.Blogs.Insert(blog)
 	if err != nil {

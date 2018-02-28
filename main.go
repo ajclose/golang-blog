@@ -5,6 +5,7 @@ import (
 
 	"github.com/ajclose/golang-blog/controllers"
 	"github.com/julienschmidt/httprouter"
+	"github.com/rs/cors"
 )
 
 func main() {
@@ -28,6 +29,12 @@ func main() {
 	r.GET("/api/blogs/:id/edit", bc.APIEdit)
 	r.POST("/blogs/:id/edit", bc.Update)
 	r.DELETE("/blogs/:id", bc.Destroy)
+	r.POST("/upload_image", bc.UploadImage)
 	r.ServeFiles("/dist/*filepath", http.Dir("dist"))
-	http.ListenAndServe("localhost:8080", r)
+	r.ServeFiles("/public/*filepath", http.Dir("public"))
+	c := cors.New(cors.Options{
+		AllowCredentials: true,
+	})
+	handler := c.Handler(r)
+	http.ListenAndServe("localhost:8080", handler)
 }

@@ -29,10 +29,10 @@ fetch('http://localhost:8080/api/blogs/'+id)
 .then(res => res.json())
 .then(json => {
     viewer.insertAdjacentHTML('afterbegin', json.body)
-    if (!json.published) {
+    // if (!json.published) {
       editLink.href = `/blogs/${id}/edit`
       editLink.textContent = 'Edit'
-    }
+    // }
 })
 .catch(err => console.error(err))
 </script>
