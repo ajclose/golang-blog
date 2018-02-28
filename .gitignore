@@ -13,6 +13,6 @@
 *.out
 
 # images
-*.png
-*.jpg
-*.jpeg
+#*.png
+#*.jpg
+#*.jpeg
