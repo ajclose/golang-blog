@@ -137,9 +137,15 @@ func (bc BlogController) Update(w http.ResponseWriter, r *http.Request, p httpro
 }
 
 func (bc BlogController) Destroy(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	if !models.IsLoggedIn(r) {
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
-		return
+	blog := models.FindBlog(p.ByName("id"))
+	images := blog.Images
+	for _, v := range images {
+		wd, err := os.Getwd()
+		if err != nil {
+			fmt.Println(err)
+		}
+		path := filepath.Join(wd, "public", "images", v.Img)
+		os.Remove(path)
 	}
 	err := config.Blogs.RemoveId(p.ByName("id"))
 	if err != nil {

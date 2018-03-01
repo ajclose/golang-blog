@@ -17,8 +17,9 @@ type Blog struct {
 	Title     string `json:"title"`
 	Body      string `json:"body"`
 	Creator   `bson:"creator"`
-	Published bool   `json:"published"`
-	Author    string `json:"author"`
+	Published bool    `json:"published"`
+	Author    string  `json:"author"`
+	Images    []Image `json:"images"`
 }
 
 type DefaultText struct {
