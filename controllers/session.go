@@ -39,6 +39,7 @@ func (sc SessionController) Create(w http.ResponseWriter, r *http.Request, _ htt
 	p := r.FormValue("password")
 	ok := config.Users.Find(bson.M{"username": un}).One(&u)
 	if ok != nil {
+		u := models.User{}
 		config.CreateView("session_new.gohtml")
 		vd := models.ViewData{u, "Username or password is incorrect"}
 		config.Base.ExecuteTemplate(w, "Base", vd)
@@ -46,6 +47,7 @@ func (sc SessionController) Create(w http.ResponseWriter, r *http.Request, _ htt
 	}
 	err := bcrypt.CompareHashAndPassword(u.Password, []byte(p))
 	if err != nil {
+		u := models.User{}
 		config.CreateView("session_new.gohtml")
 		vd := models.ViewData{u, "Username or password is incorrect"}
 		config.Base.ExecuteTemplate(w, "Base", vd)

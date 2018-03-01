@@ -36,7 +36,10 @@ func (uc UserController) Create(w http.ResponseWriter, r *http.Request, _ httpro
 	password := r.FormValue("password")
 	u, err := models.CreateUser(email, username, password)
 	if err != nil {
-		config.Base.ExecuteTemplate(w, "user_new.gohtml", err)
+		u := models.User{}
+		config.CreateView("user_new.gohtml")
+		vd := models.ViewData{u, err}
+		config.Base.ExecuteTemplate(w, "Base", vd)
 		return
 	}
 	models.CreateSession(w, r, u.Id.Hex())
