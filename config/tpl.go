@@ -2,10 +2,24 @@ package config
 
 import (
 	"html/template"
+	"path/filepath"
 )
 
-var TPL *template.Template
+var Base *template.Template
 
-func init() {
-	TPL = template.Must(template.ParseGlob("views/*.gohtml"))
+func layoutFiles() []string {
+	files, err := filepath.Glob("views/layouts/*.gohtml")
+	if err != nil {
+		panic(err)
+	}
+	return files
+}
+
+func CreateView(view string) {
+	var err error
+	files := append(layoutFiles(), "views/"+view)
+	Base, err = template.ParseFiles(files...)
+	if err != nil {
+		panic(err)
+	}
 }

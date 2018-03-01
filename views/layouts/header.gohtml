@@ -1,0 +1,23 @@
+{{define "header"}}
+<header class="header header-2">
+  <div class="branding">
+    <a href="/"><span class="title">Blog</span></a>
+  </div>
+  <h1>Email: {{.Email}}</h1>
+  {{if .Email}}
+  <div class="header-nav">
+    <a href="/blogs" class="nav-link"><span class="nav-text">Blogs</span></a>
+    <a href="/drafts" class="nav-link"><span class="nav-text">Drafts</span></a>
+    <a href="/blog/new" class="nav-link"><span class="nav-text">New Blog</span></a>
+  </div>
+  <div class="header-actions">
+    <a href="/logout" class="nav-link nav-text">Logout</a>
+  </div>
+  {{else}}
+  <div class="header-nav">
+    <a href="/signup" class="nav-link"><span class="nav-text">Signup</span></a>
+    <a href="/login" class="nav-link"><span class="nav-text">Login</span></a>
+  </div>
+  {{end}}
+</header>
+{{end}}

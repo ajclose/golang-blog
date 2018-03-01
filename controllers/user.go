@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/ajclose/golang-blog/config"
@@ -16,16 +15,28 @@ func NewUserController() *UserController {
 }
 
 func (uc UserController) New(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	config.TPL.ExecuteTemplate(w, "user_new.gohtml", nil)
+	if models.IsLoggedIn(r) {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	var data interface{}
+	user := models.User{}
+	vd := models.ViewData{user, data}
+	config.CreateView("user_new.gohtml")
+	config.Base.ExecuteTemplate(w, "Base", vd)
 }
 
 func (uc UserController) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	if models.IsLoggedIn(r) {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
 	email := r.FormValue("email")
 	username := r.FormValue("username")
 	password := r.FormValue("password")
 	u, err := models.CreateUser(email, username, password)
 	if err != nil {
-		config.TPL.ExecuteTemplate(w, "user_new.gohtml", err)
+		config.Base.ExecuteTemplate(w, "user_new.gohtml", err)
 		return
 	}
 	models.CreateSession(w, r, u.Id.Hex())
@@ -39,6 +50,7 @@ func (uc UserController) Show(w http.ResponseWriter, r *http.Request, _ httprout
 	}
 	user := models.FindUserBySessionId(r)
 	blogs := models.FindUserBlogs(user.Id.Hex())
-	fmt.Println(blogs)
-	config.TPL.ExecuteTemplate(w, "user_show.gohtml", blogs)
+	vd := models.ViewData{user, blogs}
+	config.CreateView("user_show.gohtml")
+	config.Base.ExecuteTemplate(w, "Base", vd)
 }

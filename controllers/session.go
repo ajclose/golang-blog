@@ -18,21 +18,37 @@ func NewSessionController() *SessionController {
 }
 
 func (sc SessionController) New(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	config.TPL.ExecuteTemplate(w, "session_new.gohtml", nil)
+	if models.IsLoggedIn(r) {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	var data interface{}
+	user := models.User{}
+	vd := models.ViewData{user, data}
+	config.CreateView("session_new.gohtml")
+	config.Base.ExecuteTemplate(w, "Base", vd)
 }
 
 func (sc SessionController) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	if models.IsLoggedIn(r) {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	u := models.User{}
 	un := r.FormValue("username")
 	p := r.FormValue("password")
-	u := models.User{}
 	ok := config.Users.Find(bson.M{"username": un}).One(&u)
 	if ok != nil {
-		config.TPL.ExecuteTemplate(w, "session_new.gohtml", "Username or password is incorrect")
+		config.CreateView("session_new.gohtml")
+		vd := models.ViewData{u, "Username or password is incorrect"}
+		config.Base.ExecuteTemplate(w, "Base", vd)
 		return
 	}
 	err := bcrypt.CompareHashAndPassword(u.Password, []byte(p))
 	if err != nil {
-		config.TPL.ExecuteTemplate(w, "session_new.gohtml", "Username or password is incorrect")
+		config.CreateView("session_new.gohtml")
+		vd := models.ViewData{u, "Username or password is incorrect"}
+		config.Base.ExecuteTemplate(w, "Base", vd)
 		return
 	}
 	models.CreateSession(w, r, u.Id.Hex())
@@ -40,6 +56,10 @@ func (sc SessionController) Create(w http.ResponseWriter, r *http.Request, _ htt
 }
 
 func (sc SessionController) Destroy(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	if !models.IsLoggedIn(r) {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
 	c, _ := r.Cookie("session")
 	err := config.Sessions.Remove(bson.M{"session_id": c.Value})
 	if err != nil {

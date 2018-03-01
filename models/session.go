@@ -14,6 +14,11 @@ type Session struct {
 	User_ID    string
 }
 
+type ViewData struct {
+	User User
+	Data interface{}
+}
+
 func CreateSession(w http.ResponseWriter, r *http.Request, id string) {
 	var s Session
 	sID, _ := uuid.NewV4()

@@ -1,16 +1,7 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title></title>
-    <link rel="stylesheet" href="/public/css/main.css">
-  </head>
-  <body>
-    {{template "user-header"}}
+  {{define "yield"}}
     <h1>Blogs</h1>
     {{range .}}
     <h1><a href="/blogs/{{.Id}}">{{.Title}}</a></h1>
     <h3>By {{.Author}}</h3>
     {{end}}
-  </body>
-</html>
+{{end}}

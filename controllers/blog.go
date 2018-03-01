@@ -25,13 +25,27 @@ func NewBlogController() *BlogController {
 }
 
 func (bc BlogController) Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	if !models.IsLoggedIn(r) {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
 	blogs := models.FindBlogs(true)
-	config.TPL.ExecuteTemplate(w, "blog_index.gohtml", blogs)
+	user := models.FindUserBySessionId(r)
+	vd := models.ViewData{user, blogs}
+	config.CreateView("blog_index.gohtml")
+	config.Base.ExecuteTemplate(w, "Base", vd)
 }
 
 func (bc BlogController) Drafts(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	if !models.IsLoggedIn(r) {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
 	blogs := models.FindBlogs(false)
-	config.TPL.ExecuteTemplate(w, "blog_index.gohtml", blogs)
+	user := models.FindUserBySessionId(r)
+	vd := models.ViewData{user, blogs}
+	config.CreateView("blog_index.gohtml")
+	config.Base.ExecuteTemplate(w, "Base", vd)
 }
 
 func (bc BlogController) New(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -39,7 +53,10 @@ func (bc BlogController) New(w http.ResponseWriter, r *http.Request, _ httproute
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
 	}
-	config.TPL.ExecuteTemplate(w, "blog_new.gohtml", nil)
+	user := models.FindUserBySessionId(r)
+	vd := models.ViewData{user, nil}
+	config.CreateView("blog_new.gohtml")
+	config.Base.ExecuteTemplate(w, "Base", vd)
 }
 
 func (bc BlogController) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -70,7 +87,15 @@ func (bc BlogController) APIShow(w http.ResponseWriter, r *http.Request, p httpr
 }
 
 func (bc BlogController) Show(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	config.TPL.ExecuteTemplate(w, "blog_show.gohtml", nil)
+	if !models.IsLoggedIn(r) {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+	var blog interface{}
+	user := models.FindUserBySessionId(r)
+	vd := models.ViewData{user, blog}
+	config.CreateView("blog_show.gohtml")
+	config.Base.ExecuteTemplate(w, "Base", vd)
 }
 
 func (bc BlogController) APIEdit(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -85,7 +110,15 @@ func (bc BlogController) APIEdit(w http.ResponseWriter, r *http.Request, p httpr
 }
 
 func (bc BlogController) Edit(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	config.TPL.ExecuteTemplate(w, "blog_edit.gohtml", nil)
+	if !models.IsLoggedIn(r) {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+	var blog interface{}
+	user := models.FindUserBySessionId(r)
+	vd := models.ViewData{user, blog}
+	config.CreateView("blog_edit.gohtml")
+	config.Base.ExecuteTemplate(w, "Base", vd)
 }
 
 func (bc BlogController) Update(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -104,6 +137,10 @@ func (bc BlogController) Update(w http.ResponseWriter, r *http.Request, p httpro
 }
 
 func (bc BlogController) Destroy(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	if !models.IsLoggedIn(r) {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
 	err := config.Blogs.RemoveId(p.ByName("id"))
 	if err != nil {
 		fmt.Println(err)
