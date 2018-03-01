@@ -18,7 +18,7 @@
   <body>
 {{template "user-header"}} -->
 {{define "yield"}}
-<a class="edit-link" ></a>
+<a class="edit-link"><button class="btn btn-outline">Edit</button></a>
 <div class="fr-view">
 </div>
 <script>
@@ -32,7 +32,7 @@ fetch('http://localhost:8080/api/blogs/'+id)
     viewer.insertAdjacentHTML('afterbegin', json.body)
     // if (!json.published) {
       editLink.href = `/blogs/${id}/edit`
-      editLink.textContent = 'Edit'
+      // editLink.textContent = 'Edit'
     // }
 })
 .catch(err => console.error(err))

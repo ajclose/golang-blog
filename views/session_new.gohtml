@@ -1,9 +1,17 @@
 {{define "yield"}}
-    <h1>Login</h1>
-    {{.}}
-    <form method="post">
-      <input type="text" name="username" value="" placeholder="username">
-      <input type="password" name="password" value="" placeholder="password">
-      <input type="submit" name="submit" value="Login">
-    </form>
+<div class="login-wrapper">
+  <form class="login" method="post">
+<label class="title">
+  <h3 class="welcome">Login</h3>
+</label>
+<div class="login-group">
+  <input class="username" type="text" name="username" id="login_username" value="" placeholder="username">
+  <input class="password" type="password" name="password" id="login_password" value="" placeholder="password">
+  {{if .}}
+  <div class="error active">{{.}}</div>
+  {{end}}
+  <button type="submit" class="btn btn-primary">Login</button>
+</div>
+  </form>
+</div>
 {{end}}
