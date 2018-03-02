@@ -32,6 +32,10 @@
             const blogTitle = blogContainer.querySelector('#blog-title')
             blogTitle.textContent = ''
             blogTitle.insertAdjacentHTML('afterbegin', `<a href="/blogs/${blog.id}">${blog.title}</a>`)
+            const blogDate = blogContainer.querySelector('.blog-date')
+            const date = new Date(blog.Updated_at).toDateString()
+            const time = new Date(blog.Updated_at).toTimeString().split(' ').splice(0,1).join('')
+            blogDate.textContent = date + ' ' + time
           })
         })
         .catch(err => console.log(err))

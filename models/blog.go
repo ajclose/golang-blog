@@ -36,7 +36,7 @@ type Image struct {
 
 func FindBlogs(published bool, query string) []Blog {
 	blogs := []Blog{}
-	err := config.Blogs.Find(bson.M{"$and": []bson.M{bson.M{"body": bson.M{"$regex": query, "$options": "i"}}, bson.M{"published": published}}}).Sort("-updated_at").All(&blogs)
+	err := config.Blogs.Find(bson.M{"$and": []bson.M{bson.M{"body": bson.M{"$regex": query, "$options": "i"}}, bson.M{"published": published}}}).Sort("updated_at").All(&blogs)
 	if err != nil {
 		fmt.Println("error")
 	}
