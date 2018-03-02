@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/ajclose/golang-blog/config"
 	"gopkg.in/mgo.v2/bson"
@@ -13,13 +14,15 @@ type Creator struct {
 }
 
 type Blog struct {
-	Id        string `json:"id" bson:"_id"`
-	Title     string `json:"title"`
-	Body      string `json:"body"`
-	Creator   `bson:"creator"`
-	Published bool    `json:"published"`
-	Author    string  `json:"author"`
-	Images    []Image `json:"images"`
+	Id         string `json:"id" bson:"_id"`
+	Title      string `json:"title"`
+	Body       string `json:"body"`
+	Creator    `bson:"creator"`
+	Published  bool    `json:"published"`
+	Author     string  `json:"author"`
+	Images     []Image `json:"images"`
+	Created_at time.Time
+	Updated_at time.Time
 }
 
 type DefaultText struct {
@@ -31,19 +34,17 @@ type Image struct {
 	Img string `json:'img'`
 }
 
-func FindBlogs(published bool) []Blog {
+func FindBlogs(published bool, query string) []Blog {
 	blogs := []Blog{}
-	err := config.Blogs.Find(bson.M{"published": published}).All(&blogs)
+	err := config.Blogs.Find(bson.M{"$and": []bson.M{bson.M{"body": bson.M{"$regex": query, "$options": "i"}}, bson.M{"published": published}}}).Sort("-updated_at").All(&blogs)
 	if err != nil {
 		fmt.Println("error")
-		return blogs
 	}
 	return blogs
 }
 
 func FindUserBlogs(user_id string) []Blog {
 	blogs := []Blog{}
-	fmt.Println(user_id)
 	err := config.Blogs.Find(bson.M{"creator.creator_id": user_id}).All(&blogs)
 	if err != nil {
 		fmt.Println(err)
@@ -55,7 +56,8 @@ func FindUserBlogs(user_id string) []Blog {
 func CreateBlog(blog Blog, user User) {
 	blog.Id = bson.NewObjectId().Hex()
 	blog.Creator = Creator{user.Id.Hex(), user.Username}
-
+	blog.Created_at = time.Now()
+	blog.Updated_at = time.Now()
 	err := config.Blogs.Insert(blog)
 	if err != nil {
 		fmt.Println(err)

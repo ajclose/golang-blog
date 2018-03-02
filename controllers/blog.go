@@ -9,7 +9,9 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/ajclose/golang-blog/config"
 	"github.com/ajclose/golang-blog/models"
@@ -29,11 +31,23 @@ func (bc BlogController) Index(w http.ResponseWriter, r *http.Request, _ httprou
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
 	}
-	blogs := models.FindBlogs(true)
 	user := models.FindUserBySessionId(r)
-	vd := models.ViewData{user, blogs}
+	vd := models.ViewData{user, nil}
 	config.CreateView("blog_index.gohtml")
 	config.Base.ExecuteTemplate(w, "Base", vd)
+}
+
+func (bc BlogController) APIIndex(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	queryValues := r.URL.Query()
+	search := queryValues.Get("search")
+	published, _ := strconv.ParseBool(queryValues.Get("published"))
+	blogs := models.FindBlogs(bool(published), search)
+	json, err := json.Marshal(blogs)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	w.Write(json)
 }
 
 func (bc BlogController) Drafts(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -41,9 +55,8 @@ func (bc BlogController) Drafts(w http.ResponseWriter, r *http.Request, _ httpro
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
 	}
-	blogs := models.FindBlogs(false)
 	user := models.FindUserBySessionId(r)
-	vd := models.ViewData{user, blogs}
+	vd := models.ViewData{user, nil}
 	config.CreateView("blog_index.gohtml")
 	config.Base.ExecuteTemplate(w, "Base", vd)
 }
@@ -132,6 +145,7 @@ func (bc BlogController) Update(w http.ResponseWriter, r *http.Request, p httpro
 	}
 	blog := models.FindBlog(p.ByName("id"))
 	err = json.Unmarshal(b, &blog)
+	blog.Updated_at = time.Now()
 	config.Blogs.UpdateId(p.ByName("id"), blog)
 	http.Redirect(w, r, "/blogs/"+p.ByName("id"), http.StatusFound)
 }

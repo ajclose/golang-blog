@@ -1,7 +1,40 @@
   {{define "yield"}}
     <h1>Blogs</h1>
-    {{range .}}
-    <h1><a href="/blogs/{{.Id}}">{{.Title}}</a></h1>
-    <h3>By {{.Author}}</h3>
-    {{end}}
+        <section class="form-block">
+            <div class="form-group">
+                <input type="text" id="searchField" name="search" placeholder="search">
+            </div>
+        </section>
+    <div class="blogs">
+  </div>
+    <script type="text/javascript">
+      const url = window.location.href.split('/')
+      let published
+      if (url[url.length - 1] == 'drafts') {
+        published = false
+      } else {
+        published = true
+      }
+      const searchField = document.querySelector('#searchField')
+      const blogContainer = document.querySelector('.blogs')
+      fetchBlogs('', published)
+      searchField.addEventListener('input', () => {
+        fetchBlogs(searchField.value, published)
+      })
+      function fetchBlogs(search, published) {
+        blogContainer.textContent = ''
+        fetch('http://localhost:8080/api/blogs?search='+search+'&published='+published)
+        .then(res => res.json())
+        .then(json => {
+          json.forEach(blog => {
+            const html = blog.body.substring(0, 1500) + '...'
+            blogContainer.insertAdjacentHTML('afterbegin', html)
+            const blogTitle = blogContainer.querySelector('#blog-title')
+            blogTitle.textContent = ''
+            blogTitle.insertAdjacentHTML('afterbegin', `<a href="/blogs/${blog.id}">${blog.title}</a>`)
+          })
+        })
+        .catch(err => console.log(err))
+      }
+    </script>
 {{end}}
