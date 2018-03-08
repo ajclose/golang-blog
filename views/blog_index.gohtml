@@ -3,6 +3,7 @@
         <section class="form-block">
             <div class="form-group">
                 <input type="text" id="searchField" name="search" placeholder="search">
+
             </div>
         </section>
     <div class="blogs">
@@ -27,15 +28,37 @@
         .then(res => res.json())
         .then(json => {
           json.forEach(blog => {
-            const html = blog.body.substring(0, 1500) + '...'
-            blogContainer.insertAdjacentHTML('afterbegin', html)
-            const blogTitle = blogContainer.querySelector('#blog-title')
-            blogTitle.textContent = ''
-            blogTitle.insertAdjacentHTML('afterbegin', `<a href="/blogs/${blog.id}">${blog.title}</a>`)
-            const blogDate = blogContainer.querySelector('.blog-date')
             const date = new Date(blog.Updated_at).toDateString()
             const time = new Date(blog.Updated_at).toTimeString().split(' ').splice(0,1).join('')
-            blogDate.textContent = date + ' ' + time
+            let html = `  <div class="">
+                            <h2 id="blog-title"><a href="/blogs/${blog.id}">${blog.title}</a></h2>
+                            <div class="byline">
+                              <img src="http://localhost:8080/public/images/default/mike-headshot-150.png" alt="" style="height:30px; width:30px; border-radius:100%;">
+                              <p style="margin:0;">by <a id="author-link" href="">${blog.author}</a> on <span class="blog-date">${date} ${time}</span></p>
+                            </div>
+                            <div class="social-links">
+                              <i class="fa fa-twitter-square social-icon fa-2x" style="color:#1DA1F2;"></i>
+                              <i class="fa fa-facebook-square social-icon fa-2x" style="color:#3B5998;"></i>
+                              <i class="fa fa-linkedin-square social-icon fa-2x" style="color:#0077B5;"></i>
+                              <i class="fa fa-google-plus-square social-icon fa-2x" style="color:#DB4437;"></i>
+                            </div>
+                            <br>
+                          </div>`
+            html += blog.body.substring(0, 750) + '...' + `<div class="tags"></div>`
+            blogContainer.insertAdjacentHTML('afterbegin', html)
+            const tagsContainer = document.querySelector('.tags')
+            if (blog.tags) {
+              blog.tags.forEach(tag => {
+                const html = `<div class="tag label label-blue clickable">${tag}</div>`
+                tagsContainer.insertAdjacentHTML('beforeend', html)
+              })
+            }
+          })
+          const tags = document.querySelectorAll('.tag')
+          tags.forEach(tag => {
+            tag.addEventListener('click', () => {
+              fetchBlogs(tag.textContent, published)
+            })
           })
         })
         .catch(err => console.log(err))

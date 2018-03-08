@@ -14,3 +14,11 @@
   font-size:40px !important;
   margin:5px;
 }
+
+.tags {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 10px 0;
+}
